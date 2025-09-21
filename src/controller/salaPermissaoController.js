@@ -14,18 +14,29 @@ endpoints.post('/sala/:sala/entrar', autenticador, async (req, resp) => {
     let usuarioId = req.user.id
     let permissao = false;
 
-    let pedirPermisao = await salaPermissaoRepo.inserirPermissao(salaId,usuarioId,permissao)
+
+    await salaPermissaoRepo.inserirPermissao(salaId,usuarioId,permissao)
     resp.send()
 });
 
 
 endpoints.post('/sala/:sala/aprovar/:usuario', autenticador, async (req, resp) => {
-    let salaId = req.params.id
-    let usuarioId = req.params.id
-    let usualioLogadoId = req.user.id
+    const salaId = req.params.sala;
+    const usuarioId = req.params.usuario;
+    const usuarioLogadoId = req.user.id
 
-    let permissao = await salaRepo.buscarSalaPorId(salaId)
+    const donoSala = await salaPermissaoRepo.verificarPermissaoSala(salaId);
+
+    if (Number(donoSala.usuario_id) !== Number(usuarioLogadoId)) {
+      return resp.status(403).send('Somente o dono da sala pode aprovar um novo usuário.');
+    }
+
+    await salaPermissaoRepo.aprovarPermissao(salaId, usuarioId);
+    return resp.status(200).send({ mensagem: 'Usuário aprovado com sucesso!' });
+
+
 });
+
 
 
 

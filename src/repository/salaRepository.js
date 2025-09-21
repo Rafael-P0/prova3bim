@@ -26,6 +26,6 @@ export async function buscarSalaPorId(salaId) {
    let [info] = await connection.query(comando, [
     salaId
    ])
-   return info;
+   return info[0]
 }
 
